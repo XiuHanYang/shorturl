@@ -2,9 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\BasicController;
-use App\Models\Urls;
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 
 class UrlCreate extends Command
@@ -14,7 +11,7 @@ class UrlCreate extends Command
      *
      * @var string
      */
-    protected $signature = 'url:create {url} {--open : 是否開啟頁面}';
+    protected $signature = 'url:create {url} {name} {--open : 是否開啟頁面}';
 
     /**
      * The console command description.
@@ -31,19 +28,22 @@ class UrlCreate extends Command
     public function handle(\App\BasicController $basicController)
     {
         $inputUrl = $this->argument('url');
+        $inputName = urlencode($this->argument('name'));
 
-        if (!$basicController->checkUrlRules($inputUrl)) {
+        $param = ['inputUrl' => $inputUrl, 'inputName' => $inputName];
+
+        if (!$basicController->checkUrlRules($param['inputUrl'])) {
             $this->output->error('輸入的 URL 不符合格式！');
             return -1;
         }
 
-        $datas = $basicController->createUrl($inputUrl);
+        $datas = $basicController->createUrl($param);
 
         if ($this->option('open')) {
-            shell_exec("open '$inputUrl'");
+            shell_exec("open '$param[inputUrl]'");
         }
 
-        $this->line('http://localhost/'.$datas->short_url);
+        $this->line('http://localhost/' . $datas->short_url);
 
         return -1;
     }

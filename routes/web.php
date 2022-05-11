@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UrlController;
+use App\Http\Middleware\CheckNameOnly;
 use App\Http\Middleware\CheckUrlRegex;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +23,6 @@ Route::get('/', function () {
 Route::resources(['urls'    =>  UrlController::class]);
 
 Route::post('urls', [UrlController::class, 'store'])
-    ->middleware([CheckUrlRegex::class]);
+    ->middleware([CheckUrlRegex::class, CheckNameOnly::class]);
 
-Route::get('/{randomParam}',[UrlController::class, 'redirect']);
+Route::get('/{randomParam}', [UrlController::class, 'redirect']);

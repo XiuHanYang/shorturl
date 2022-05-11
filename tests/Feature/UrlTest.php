@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\BasicController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -11,8 +10,9 @@ use Exception;
 class UrlTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
-     * @testdox 當資料表為空時，新增一筆「https://www.google.com.tw」，應該只會有一筆「https://www.google.com.tw」資料
+     * @testdox 當資料表為空時，新增一筆命名為「hannah」的「https://www.google.com.tw」，應該只會有一筆「https://www.google.com.tw」資料
      *
      * @return void
      */
@@ -20,15 +20,15 @@ class UrlTest extends TestCase
     {
         $basicController = new \App\BasicController();
 
-        $expected = 'https://www.google.com.tw';
+        $expected = ['inputUrl' => 'https://www.google.com.tw', 'inputName' => 'hannah'];
 
         $actual = $basicController->createUrl($expected)->origin_url;
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected['inputUrl'], $actual);
     }
 
     /**
-     * @testdox 當資料表已有「https://www.google.com.tw」時，新增一筆「https://laravel.com/」，應該要有兩筆「https://www.google.com.tw」及「https://laravel.com/」資料
+     * @testdox 當資料表已有命名為「hannah」的「https://www.google.com.tw」時，新增一筆命名為「hannah-1」的「https://laravel.com/」，應該要有兩筆「https://www.google.com.tw」及「https://laravel.com/」資料
      *
      * @return void
      */
@@ -36,13 +36,15 @@ class UrlTest extends TestCase
     {
         $basicController = new \App\BasicController();
 
-        $expected = ['https://www.google.com.tw', 'https://laravel.com/'];
+        $expected = [
+            ['inputUrl' => 'https://www.google.com.tw', 'inputName' => 'hannah'],
+            ['inputUrl' => 'https://laravel.com/', 'inputName' => 'hannah-1']
+        ];
 
         $basicController->createUrl($expected[0]);
         $actual = $basicController->createUrl($expected[1])->origin_url;
 
-        $this->assertSame($expected[1], $actual);
-
+        $this->assertSame($expected[1]['inputUrl'], $actual);
     }
 
     /**
@@ -62,7 +64,7 @@ class UrlTest extends TestCase
     }
 
     /**
-     * @testdox 當資料表已有「https://www.google.com.tw」時，新增一筆「https://www.google.com.tw」的資料，應該會顯示「已儲存的短網址」紀錄
+     * @testdox 當資料表已有命名為「hannah」的「https://www.google.com.tw」時，新增一筆「https://www.google.com.tw」的資料，應該會顯示「已儲存的短網址」紀錄
      *
      * @return void
      */
@@ -70,10 +72,30 @@ class UrlTest extends TestCase
     {
         $basicController = new \App\BasicController();
 
-        $expected = 'https://www.google.com.tw';
+        $expected = ['inputUrl' => 'https://www.google.com.tw', 'inputName' => 'hannah'];
 
         $actual = $basicController->createUrl($expected)->origin_url;
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected['inputUrl'], $actual);
+    }
+
+    /**
+     * @testdox 當資料表已有命名為「hannah」的「https://www.google.com.tw」時，新增一筆命名為「hannah」的「https://laravel.com」的資料，應該會有「已重複命名！」的錯誤訊息
+     *
+     * @return void
+     */
+    public function test_should_show_exception_when_add_same_name_into_table()
+    {
+        $this->expectException(Exception::class);
+
+        $basicController = new \App\BasicController();
+
+        $expected = [
+            ['inputUrl' => 'https://www.google.com.tw', 'inputName' => 'hannah'],
+            ['inputUrl' => 'https://laravel.com/', 'inputName' => 'hannah']
+        ];
+
+        $basicController->createUrl($expected[0]);
+        $basicController->checkNameOnly($expected[1]['inputName']);
     }
 }

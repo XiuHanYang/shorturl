@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class CheckUrlRegex
+class CheckNameOnly
 {
     /**
      * Handle an incoming request.
@@ -18,8 +18,8 @@ class CheckUrlRegex
     {
         $basicController = new \App\BasicController();
 
-        $inputUrl = $request->get('inputUrl');
-        $basicController->checkUrlRules($inputUrl);
+        $inputName = $request->get('inputName');
+        $basicController->checkNameOnly($inputName);
 
         return $next($request);
     }

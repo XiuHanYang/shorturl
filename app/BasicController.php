@@ -3,13 +3,12 @@
 namespace App;
 
 use App\Models\Urls;
-use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
-class BasicController {
-
+class BasicController
+{
     public function checkUrlRules($inputUrl)
     {
         $pattern = '/^(https:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
@@ -21,39 +20,27 @@ class BasicController {
         return true;
     }
 
-    public function createUrl($inputUrl)
+    public function createUrl($param)
     {
         $shortUrl = '';
-        $randomParam = '';
 
-        if (Urls::where('origin_url', $inputUrl)->count() > 0) {
-            $shortUrl = Urls::where('origin_url', $inputUrl)->first();
+        if (Urls::where('origin_url', $param['inputUrl'])->count() > 0) {
+            $shortUrl = Urls::where('origin_url', $param['inputUrl'])->first();
             return $shortUrl;
         }
 
-        $randomParam = $this->randomParam($inputUrl);
-
         return Urls::create([
-            'origin_url'    =>  $inputUrl,
-            'short_url'     =>  $randomParam
-        ]);
-
-    }
-
-    public function randomParam($inputUrl)
-    {
-        $randomParam = Str::random(6, $inputUrl);
-
-        return $randomParam;
-    }
-
-    public function insertUrl($param)
-    {
-        return Urls::create([
-            'origin_url'    =>  $param->inputUrl,
-            'short_url'     =>  $param->randomParam
+            'origin_url'    =>  $param['inputUrl'],
+            'short_url'     =>  $param['inputName']
         ]);
     }
 
+    public function checkNameOnly($inputName)
+    {
+        if (Urls::where('short_url', urlencode($inputName))->count() > 0) {
+            throw new Exception('已重複命名！');
+        }
+
+        return true;
+    }
 }
-?>

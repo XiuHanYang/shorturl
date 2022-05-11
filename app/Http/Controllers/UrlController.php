@@ -40,10 +40,13 @@ class UrlController extends Controller
         //
         $localUrl = 'http://localhost/';
         $inputUrl = $request->get('inputUrl');
+        $inputName = urlencode($request->get('inputName'));
+
+        $param = ['inputUrl' => $inputUrl, 'inputName' => $inputName];
 
         DB::enableQueryLog();
 
-        $shortUrl = $localUrl.$basicController->createUrl($inputUrl)->short_url;
+        $shortUrl = $localUrl . $basicController->createUrl($param)->short_url;
 
         Log::debug(DB::getQueryLog());
 
@@ -60,7 +63,6 @@ class UrlController extends Controller
     public function show()
     {
         //
-        return Urls::all();
     }
 
     /**
@@ -109,6 +111,4 @@ class UrlController extends Controller
 
         return redirect($originUrl);
     }
-
-
 }
