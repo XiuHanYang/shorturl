@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Http\Controllers\UrlController;
 
 class UrlDelete extends Command
 {
@@ -11,14 +12,14 @@ class UrlDelete extends Command
      *
      * @var string
      */
-    protected $signature = 'url:delete';
+    protected $signature = 'url:delete {id}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '刪除過期的短網址';
+    protected $description = '刪除短網址';
 
     /**
      * Execute the console command.
@@ -27,6 +28,15 @@ class UrlDelete extends Command
      */
     public function handle()
     {
+
+        $urlController = new UrlController();
+
+        $id = $this->argument('id');
+
+        $urlController->destroy($id);
+
+        $this->line('刪除成功');
+
         return 0;
     }
 }

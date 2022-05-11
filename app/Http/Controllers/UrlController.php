@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Urls;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
@@ -63,6 +64,7 @@ class UrlController extends Controller
     public function show()
     {
         //
+        return Urls::all();
     }
 
     /**
@@ -97,6 +99,11 @@ class UrlController extends Controller
     public function destroy($id)
     {
         //
+        if (!Urls::where('id', $id)->count()) {
+            throw new Exception('不存在的 id ！');
+        }
+        Urls::where('id', $id)->delete();
+        return response()->json(true, 200);
     }
 
     public function redirect()

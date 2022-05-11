@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\UrlController;
+use App\Models\Urls;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -97,5 +99,38 @@ class UrlTest extends TestCase
 
         $basicController->createUrl($expected[0]);
         $basicController->checkNameOnly($expected[1]['inputName']);
+    }
+
+    /**
+     * @testdox 當資料表已有命名為「hannah」的「https://www.google.com.tw」時，刪除「https://www.google.com.tw」，應該會更新「deleted_at」時間
+     *
+     * @return void
+     */
+    public function test_should_show_status_code_when_id_in_table()
+    {
+        $urlController = new UrlController();
+        $basicController = new \App\BasicController();
+
+        $data = ['inputUrl' => 'https://www.google.com.tw', 'inputName' => 'hannah'];
+
+        $data = $basicController->createUrl($data);
+
+        $actual = $urlController->destroy(6)->status();
+
+        $this->assertSame(200, $actual);
+    }
+
+    /**
+     * @testdox 刪除「不存在的 id」，應該會有「不存在的 id ！」的錯誤訊息
+     *
+     * @return void
+     */
+    public function test_should_show_exception_when_id_not＿exist_table()
+    {
+        $this->expectException(Exception::class);
+
+        $urlController = new UrlController();
+
+        $urlController->destroy(1);
     }
 }
