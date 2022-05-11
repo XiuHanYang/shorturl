@@ -125,7 +125,7 @@ class UrlTest extends TestCase
      *
      * @return void
      */
-    public function test_should_show_exception_when_id_not＿exist_table()
+    public function test_should_show_exception_when_id_not_exist_table()
     {
         $this->expectException(Exception::class);
 

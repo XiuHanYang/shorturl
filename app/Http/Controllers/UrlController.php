@@ -64,7 +64,6 @@ class UrlController extends Controller
     public function show()
     {
         //
-        return Urls::all();
     }
 
     /**
