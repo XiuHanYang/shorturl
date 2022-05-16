@@ -2,23 +2,24 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\NamespaceController;
 use Illuminate\Console\Command;
 
-class NameOnly extends Command
+class NamespaceDelete extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'name:only {name}';
+    protected $signature = 'namespace:delete {id}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '檢查重複命名';
+    protected $description = '刪除命名空間';
 
     /**
      * Execute the console command.
@@ -27,14 +28,14 @@ class NameOnly extends Command
      */
     public function handle(\App\BasicController $basicController)
     {
-        $inputName = $this->argument('name');
 
-        if (!$basicController->checkNameOnly('short_url', $inputName)) {
-            $this->output->error('已重複命名');
-            return -1;
-        }
+        $namespaceController = new NamespaceController();
 
-        $this->line('命名成功');
+        $id = $this->argument('id');
+
+        $namespaceController->destroy($id, $basicController);
+
+        $this->line('刪除成功');
 
         return 0;
     }

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UrlController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\NamespaceController;
 use App\Http\Middleware\CheckNameOnly;
 use App\Http\Middleware\CheckUrlRegex;
 
@@ -20,9 +22,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resources(['urls'    =>  UrlController::class]);
+Route::resource('urls', UrlController::class)->only([
+    'store', 'destroy', 'show'
+]);
+
+Route::resource('members', MemberController::class)->only([
+    'store', 'destroy', 'show'
+]);
+
+Route::resource('namespaces', NamespaceController::class)->only([
+    'store', 'destroy', 'show'
+]);
 
 Route::post('urls', [UrlController::class, 'store'])
     ->middleware([CheckUrlRegex::class, CheckNameOnly::class]);
 
-Route::get('/{randomParam}', [UrlController::class, 'redirect']);
+Route::get('/{memberName}/{namespaceName}/{randomParam}', [UrlController::class, 'redirect']);

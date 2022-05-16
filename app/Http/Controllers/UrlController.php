@@ -39,15 +39,13 @@ class UrlController extends Controller
     public function store(Request $request, \App\BasicController $basicController)
     {
         //
-        $localUrl = 'http://localhost/';
         $inputUrl = $request->get('inputUrl');
-        $inputName = urlencode($request->get('inputName'));
-
-        $param = ['inputUrl' => $inputUrl, 'inputName' => $inputName];
+        $inputMemberId = $request->get('inputMemberId');
+        $inputNamespaceId = $request->get('inputNamespaceId');
 
         DB::enableQueryLog();
 
-        $shortUrl = $localUrl . $basicController->createUrl($param)->short_url;
+        $shortUrl = $basicController->createUrl($inputUrl, $inputMemberId, $inputNamespaceId);
 
         Log::debug(DB::getQueryLog());
 
@@ -61,9 +59,21 @@ class UrlController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show($id)
     {
         //
+        $localUrl = 'http://localhost/';
+
+        $data = DB::table('urls')
+        ->leftJoin('namespaces', 'urls.namespace_id', '=', 'namespaces.id')
+        ->leftJoin('members', 'namespaces.member_id', '=', 'members.id')
+        ->select('urls.origin_url as originUrl', 'urls.short_url as shortUrl', 'namespaces.name as namespaceName', 'members.name as memberName')
+        ->where('urls.id', $id)
+        ->first();
+
+        $data->shortUrl = $localUrl . $data->memberName . '/' . $data->namespaceName . '/' . $data->shortUrl;
+
+        return $data;
     }
 
     /**
@@ -105,13 +115,18 @@ class UrlController extends Controller
         return response()->json(true, 200);
     }
 
-    public function redirect()
+    public function redirect($memberName, $namespaceName, $randomParam)
     {
 
         DB::enableQueryLog();
 
-        $randomParam = (trim($_SERVER['REQUEST_URI'], '/'));
-        $originUrl = Urls::where('short_url', $randomParam)->firstOrFail()->origin_url;
+        $originUrl = DB::table('urls')
+        ->leftJoin('namespaces', 'urls.namespace_id', '=', 'namespaces.id')
+        ->leftJoin('members', 'namespaces.member_id', '=', 'members.id')
+        ->select('urls.origin_url as originUrl', 'urls.short_url as shortUrl', 'namespaces.name as namespaceName', 'members.name as memberName')
+        ->where([['members.name', $memberName], ['namespaces.name', $namespaceName], ['urls.short_url', $randomParam]])
+        ->first()
+        ->originUrl;
 
         Log::debug(DB::getQueryLog());
 

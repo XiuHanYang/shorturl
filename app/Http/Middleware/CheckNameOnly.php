@@ -19,7 +19,7 @@ class CheckNameOnly
         $basicController = new \App\BasicController();
 
         $inputName = $request->get('inputName');
-        $basicController->checkNameOnly($inputName);
+        $basicController->checkNameOnly('short_url', $inputName);
 
         return $next($request);
     }
